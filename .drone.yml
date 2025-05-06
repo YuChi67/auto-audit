@@ -1,0 +1,59 @@
+kind: pipeline
+type: docker
+name: CI Process
+steps:
+  # release 動作
+  - name: 版本控制
+    image: registry.digiwincloud.com.cn/cloud/base_vc
+    commands:
+      - make branch=release vc
+    when:
+      status: [ success ]
+      branch:
+        - release
+  - name: 打包與推送 Docker Image
+    image: plugins/docker
+    volumes:
+    - name: daemon
+      path: /var/run/docker.sock
+    settings:
+      username:
+        from_secret: dockerUsername
+      password:
+        from_secret: dockerPassword
+      repo: registry.digiwincloud.com.cn/cloud/auto-audit
+      registry: registry.digiwincloud.com.cn
+    when:
+      status: [ success ]
+      branch:
+        - release
+  - name: 上傳版本
+    image: registry.digiwincloud.com.cn/cloud/base_vc
+    commands:
+      - make branch=release add_tag
+    when:
+      status: [ success ]
+      branch:
+        - release
+  - name: 钉钉通知
+    image: registry.digiwincloud.com.cn/cloud/drone-dingtalk
+    settings:
+      token:
+        from_secret: dingTalkToken
+      type: markdown
+      message_color: true
+      message_pic: true
+      sha_link: true
+    when:
+      status: [failure, success]
+trigger:
+  branch:
+    - release
+  event:
+    - push
+    - pull_request
+
+volumes:
+- name: daemon
+  host:
+    path: /var/run/docker.sock
