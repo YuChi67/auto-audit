@@ -20,19 +20,19 @@
     <td>*</td>
     <td>PROJECTKEY</td>
     <td>sonarqube 中的 project key</td>
-    <td>devops_bff-service</td>
+    <td>auto-audit</td>
   </tr>
   <tr>
     <td>*</td>
     <td>TO</td>
     <td>收件人，請使用`,`分隔</td>
-    <td>yuchitu@digiwin.com</td>
+    <td>yuchi060703@gmail.com</td>
   </tr>
   <tr>
     <td>*</td>
     <td>URL</td>
     <td>sonarqube 網址</td>
-    <td>http://10.40.40.159:9010</td>
+    <td></td>
   </tr>
   <tr>
     <td>*</td>
@@ -98,17 +98,17 @@
 
 ```
   - name: 稽核結果通知
-    image: registry.digiwincloud.com/cloud/auto-audit
+    image: <registry_url>/auto-audit
     settings:
       username:
         from_secret: dockerUsername
       password:
         from_secret: dockerPassword
     commands:
-      - export URL=http://10.40.40.159:9010
+      - export URL=**
       - export ACCOUNT=***
       - export PASSWORD=***
-      - export PROJECTKEY=devops_bff-service
+      - export PROJECTKEY=auto-audit
       - export NOTIFY=bug,vulnerability
       - export TO=${DRONE_COMMIT_AUTHOR_EMAIL}
       - export CHECKREQUIRE=true
